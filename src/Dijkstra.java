@@ -34,10 +34,25 @@ public class Dijkstra
 
         Dijkstra(ht, start);
 
-        String location = "C";
+        String location = "B";
 
         if(ht.get(location).getWeight()!=Integer.MAX_VALUE/2)
-            System.out.println("Shortest Distance from "+start+" to "+location+" is "+ ht.get(location).getWeight());
+        {
+            System.out.println("Shortest Distance from " + start + " to " + location + " is " + ht.get(location).getWeight());
+
+            System.out.print("This was achieved through the path: ");
+            String pre = ht.get(location).getName();
+            Stack<String> s = new Stack<>();
+            while(pre!="")
+            {
+                s.push(pre);
+                pre = ht.get(pre).getPre();
+            }
+            while(s.isEmpty()==false)
+            {
+                System.out.print(s.pop()+" ");
+            }
+        }
         else
             System.out.println("There is no shortest path");
     }
@@ -46,20 +61,13 @@ public class Dijkstra
         ht.get(start).setWeight(0);
         Set<String> keys = ht.keySet();
         PriorityQueue<vertex> pq = new PriorityQueue<>();
-        HashSet<String> hs = new HashSet<>();
 
-        pq.offer(ht.get(start));
+        for(String key: keys)
+                pq.offer(ht.get(key));
 
         while(pq.isEmpty()==false)
         {
-            pq.clear();
-
-            for(String key: keys)
-                if(!hs.contains(key))
-                    pq.offer(ht.get(key));
-
-            vertex v = pq.remove();
-            hs.add(v.getName());
+            vertex v =  pq.remove();
 
             if(v.getAdj()!=null)
             {
@@ -71,8 +79,11 @@ public class Dijkstra
 
                     if (ht.get(ad.getName()).getWeight() > v.getWeight() + ad.getEdgeWeight())
                     {
-                        ht.get(ad.getName()).setWeight(v.getWeight() + ad.getEdgeWeight());
-                        ht.get(ad.getName()).setPre(v.getName());
+                        vertex vv = ht.get(ad.getName());
+                        pq.remove(ht.get(ad.getName()));
+                        vv.setWeight(v.getWeight() + ad.getEdgeWeight());
+                        vv.setPre(v.getName());
+                        pq.offer(vv);
                     }
                 }
             }
